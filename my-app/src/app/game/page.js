@@ -57,6 +57,16 @@ export default function GamePage() {
     const data = await res.json();
     const newCards = [...playerCards, ...data.cards];
     setPlayerCards(newCards);
+
+    const newScore = calculateScore(newCards);
+    if (newScore >= 22) {
+      setGameOver(true);
+      setResult("Bust");
+    }
+    if (newScore === 21) {
+      setGameOver(true);
+      setResult("Blackjack!");
+    }
   };
 
   // Stand
