@@ -89,6 +89,20 @@ export default function GamePage() {
     }
   };
 
+  const startNewGame = async () => {
+    const deckRes = await fetch("https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1");
+    const deckData = await deckRes.json();
+    setDeckId(deckData.deck_id);
+
+    const drawRes = await fetch(`https://deckofcardsapi.com/api/deck/${deckData.deck_id}/draw/?count=4`);
+    const drawData = await drawRes.json();
+
+    setPlayerCards([drawData.cards[0], drawData.cards[1]]);
+    setDealerCards([drawData.cards[2], drawData.cards[3]]);
+    setGameOver(false);
+    setResult("");
+  };
+
   return (
     <main style={{ textAlign: "center", padding: "2rem" }}>
       <h1>Blackjack</h1>
@@ -117,6 +131,11 @@ export default function GamePage() {
           <p>Du hast gestanden.</p>
           <h2>{result}</h2>
         </>
+      )}
+      {gameOver && (
+        <button onClick={startNewGame} style={{ marginTop: "1rem" }}>
+          Neues Spiel
+        </button>
       )}
     </main>
   );
