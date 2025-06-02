@@ -1,34 +1,62 @@
 "use client";
-import { useState } from 'react';
+import { useEffect, useState } from "react";
 
 export default function GamePage() {
   const [deckId, setDeckId] = useState(null);
   const [playerCards, setPlayerCards] = useState([]);
+  const [gameOver, setGameOver] = useState(false);
 
-  const shuffleDeck = async () => {
-    const { deck_id } = await fetch(
-      "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1"
-    ).then(r => r.json());
-    setDeckId(deck_id);
-    setPlayerCards([]);
+  // Deck initialisieren
+  useEffect(() => {
+    const startGame = async () => {
+      const deckRes = await fetch("https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1");
+      const deckData = await deckRes.json();
+      setDeckId(deckData.deck_id);
+
+      const drawRes = await fetch(`https://deckofcardsapi.com/api/deck/${deckData.deck_id}/draw/?count=2`);
+      const drawData = await drawRes.json();
+      setPlayerCards(drawData.cards);
+    };
+
+    startGame();
+  }, []);
+
+  // Hit
+  const handleHit = async () => {
+    if (!deckId || gameOver) return;
+
+    const res = await fetch(`https://deckofcardsapi.com/api/deck/${deckId}/draw/?count=1`);
+    const data = await res.json();
+    setPlayerCards((prev) => [...prev, ...data.cards]);
   };
 
-  const drawCard = async () => {
-    const { cards } = await fetch(
-      `https://deckofcardsapi.com/api/deck/${deckId}/draw/?count=1`
-    ).then(r => r.json());
-    setPlayerCards(prev => [...prev, ...cards]);
+  // Stand
+  const handleStand = () => {
+    setGameOver(true);
+    // ==================================
+    // Dealer Logik
+    // ==================================
   };
 
   return (
-    <div>
-      <button onClick={shuffleDeck}>Shuffle</button>
-      <button onClick={drawCard}>Draw</button>
-      <div>
-        {playerCards.map(card => (
-          <img key={card.code} src={card.image} alt={card.code} />
+    <main style={{ textAlign: "center", padding: "2rem" }}>
+      <h1>Blackjack</h1>
+
+      <h2>Deine Karten:</h2>
+      <div style={{ display: "flex", justifyContent: "center", gap: "1rem", flexWrap: "wrap", marginBottom: "1rem" }}>
+        {playerCards.map((card) => (
+          <img key={card.code} src={card.image} alt={card.code} width={100} />
         ))}
       </div>
-    </div>
+
+      {!gameOver ? (
+        <div style={{ display: "flex", justifyContent: "center", gap: "1rem" }}>
+          <button onClick={handleHit}>Hit</button>
+          <button onClick={handleStand}>Stand</button>
+        </div>
+      ) : (
+        <p>Du hast gestanden.</p>
+      )}
+    </main>
   );
 }
