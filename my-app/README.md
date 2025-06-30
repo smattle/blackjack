@@ -19,13 +19,13 @@ CMD ["npm", "start"]
 Das Dockerfile hat 7 logische Level. 
 
 
-###### Base Immage: 
+###### Base Image: 
 FROM node:18
 
 ###### Arbeitsverzeichnis festlegen:
 WORKDIR /app
 
-###### Abhängigkeiten instalieren:
+###### Abhängigkeiten installieren:
 COPY package*.json ./
 RUN npm install
 
