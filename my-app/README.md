@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+AWS: http://3.236.112.126:3000
 
-## Getting Started
+Beim Deployment habe ich mit AWS gearbeitet, da ich damit bereits bekannt war und es konsistenter funktioniert hat als Auzre.
 
-First, run the development server:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+##### Dockerfile:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+FROM node:18
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+EXPOSE 3000
+CMD ["npm", "start"]
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+Das Dockerfile hat 7 logische Level. 
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+###### Base Image: 
+FROM node:18
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+###### Arbeitsverzeichnis festlegen:
+WORKDIR /app
 
-## Deploy on Vercel
+###### Abhängigkeiten installieren:
+COPY package*.json ./
+RUN npm install
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+###### Code kopieren:
+COPY . .
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+###### Anwendung bauen:
+RUN npm run build
+
+###### Port freigeben:
+EXPOSE 3000
+
+###### Anwendung starten:
+CMD ["npm", "start"]
+
+
+Das ganze ist ein ziemlich normales Dockerfile. Was ich mir dabei gedacht habe war lediglich die Abhängigkeiten und den Code zu trennen um die Wiederverwendbarkeit zu fördern.
